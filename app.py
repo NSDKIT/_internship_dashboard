@@ -156,46 +156,36 @@ def main():
         if selected_work_type != "すべて":
             df = df[df['形式'] == selected_work_type]
 
-    # 掲示板形式で表示
-    for _, internship in df.iterrows():
-        with st.expander(f"📌 {internship['インターン名']} - {internship.get('企業名', '未設定')} ({internship.get('業界', '未設定')})"):
-            # 基本情報を表形式で表示
-            basic_info = {
-                "項目": ["形式", "勤務地", "期間", "職種", "応募締切"],
-                "内容": [
-                    internship.get('形式', '未設定'),
-                    internship.get('勤務地', '未設定'),
-                    internship.get('期間', '未設定'),
-                    internship.get('職種', '未設定'),
-                    internship.get('応募締切', '未設定')
-                ]
-            }
-            st.table(pd.DataFrame(basic_info))
-            
-            # 詳細情報を表示するボタン
-            if st.button("詳細情報を表示", key=f"detail_{internship['インターン名']}"):
-                # 詳細情報を表形式で表示
-                detail_info = {
-                    "項目": ["必須スキル", "報酬", "交通費", "勤務可能時間", "勤務日数", "勤務時間", "選考フロー", "募集人数", "歓迎スキル", "歓迎スキル2"],
-                    "内容": [
-                        internship.get('必須スキル', '未設定'),
-                        internship.get('報酬', '未設定'),
-                        internship.get('交通費', '未設定'),
-                        internship.get('勤務可能時間', '未設定'),
-                        internship.get('勤務日数', '未設定'),
-                        internship.get('勤務時間', '未設定'),
-                        internship.get('選考フロー', '未設定'),
-                        internship.get('募集人数', '未設定'),
-                        internship.get('歓迎スキル', '未設定'),
-                        internship.get('歓迎スキル2', '未設定')
-                    ]
-                }
-                st.table(pd.DataFrame(detail_info))
-                
-                # 説明文を表示
-                st.markdown("### 説明")
-                st.markdown(create_internship_card(internship), unsafe_allow_html=True)
-        
+    # 掲示板カード形式で表示
+    for idx, internship in df.iterrows():
+        with st.container():
+            cols = st.columns([1, 5])
+            with cols[0]:
+                # 企業ロゴやイメージのプレースホルダー
+                st.image("https://placehold.jp/80x80.png", width=80)
+            with cols[1]:
+                st.markdown(f"**{internship['インターン名']}**")
+                st.markdown(f"{internship['企業名']} | {internship['業界']} | {internship['勤務地']} | {internship['職種']}")
+                st.markdown(f"💰 {internship.get('報酬', '未設定')} | 🕒 {internship.get('勤務日数', '未設定')}日/{internship.get('勤務時間', '未設定')}時間")
+                if pd.notna(internship.get('応募締切')):
+                    st.markdown(f"〆切: {internship['応募締切']:%Y-%m-%d}")
+                with st.expander("詳細を見る"):
+                    # 詳細情報を表形式で表示
+                    detail_info = {
+                        "項目": ["必須スキル", "交通費", "勤務可能時間", "選考フロー", "募集人数", "歓迎スキル", "歓迎スキル2"],
+                        "内容": [
+                            internship.get('必須スキル', '未設定'),
+                            internship.get('交通費', '未設定'),
+                            internship.get('勤務可能時間', '未設定'),
+                            internship.get('選考フロー', '未設定'),
+                            internship.get('募集人数', '未設定'),
+                            internship.get('歓迎スキル', '未設定'),
+                            internship.get('歓迎スキル2', '未設定')
+                        ]
+                    }
+                    st.table(pd.DataFrame(detail_info))
+                    st.markdown("### 説明")
+                    st.markdown(create_internship_card(internship), unsafe_allow_html=True)
         st.markdown("---")  # 区切り線
 
 if __name__ == "__main__":
