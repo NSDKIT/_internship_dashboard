@@ -38,17 +38,17 @@ st.markdown("""
         border-radius: 5px;
     }
     .stExpander {
-        background-color: white;
+        background-color: #f8f5f2;
         border-radius: 5px;
         padding: 1rem;
         margin: 1rem 0;
     }
     .stContainer {
-        background-color: white;
+        background-color: #f8f5f2;
         border-radius: 5px;
         padding: 1rem;
         margin: 1rem 0;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(139,69,19,0.1);
     }
     .sidebar .sidebar-content {
         background-color: #8B4513;
