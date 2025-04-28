@@ -107,22 +107,12 @@ def create_internship_card(internship):
     period = internship.get('期間', '')
     position = internship.get('職種', '')
     salary = internship.get('報酬', '')
-    transportation = internship.get('交通費', '')
-    work_hours = internship.get('勤務可能時間', '')
-    work_days = internship.get('勤務日数', '')
-    work_time = internship.get('勤務時間', '')
-    selection = internship.get('選考フロー', '')
     deadline = internship.get('応募締切', '')
-    start_date = internship.get('開始予定日', '')
-    required_skills = internship.get('必須スキル', '')
-    preferred_skills = internship.get('歓迎スキル', '')
     description = internship.get('説明', '')
 
     # 日付の整形
     if isinstance(deadline, pd.Timestamp):
         deadline = deadline.strftime('%Y-%m-%d')
-    if isinstance(start_date, pd.Timestamp):
-        start_date = start_date.strftime('%Y-%m-%d')
 
     card_html = f"""
     <div style="
@@ -131,7 +121,7 @@ def create_internship_card(internship):
         margin-bottom: 20px;
         border-radius: 10px;
         box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        min-height: 250px;
+        min-height: 200px;
     ">
         <h3 style="color: #2c3e50; margin-top: 0;">{title}</h3>
         <div style="margin-bottom: 15px;">
@@ -140,25 +130,12 @@ def create_internship_card(internship):
             <span style="margin-left: 10px; color: #7f8c8d;">{work_type}</span>
         </div>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
-            <div>
-                <p style="margin: 5px 0;"><strong>勤務地:</strong> {location}</p>
-                <p style="margin: 5px 0;"><strong>最寄り駅:</strong> {station}</p>
-                <p style="margin: 5px 0;"><strong>期間:</strong> {period}</p>
-                <p style="margin: 5px 0;"><strong>職種:</strong> {position}</p>
-            </div>
-            <div>
-                <p style="margin: 5px 0;"><strong>報酬:</strong> {salary}</p>
-                <p style="margin: 5px 0;"><strong>交通費:</strong> {transportation}</p>
-                <p style="margin: 5px 0;"><strong>勤務時間:</strong> {work_hours}</p>
-                <p style="margin: 5px 0;"><strong>勤務日数:</strong> {work_days}</p>
-            </div>
-        </div>
-
         <div style="margin-bottom: 15px;">
-            <p style="margin: 5px 0;"><strong>選考フロー:</strong> {selection}</p>
+            <p style="margin: 5px 0;"><strong>勤務地:</strong> {location}（{station}）</p>
+            <p style="margin: 5px 0;"><strong>期間:</strong> {period}</p>
+            <p style="margin: 5px 0;"><strong>職種:</strong> {position}</p>
+            <p style="margin: 5px 0;"><strong>報酬:</strong> {salary}</p>
             <p style="margin: 5px 0;"><strong>応募締切:</strong> {deadline}</p>
-            <p style="margin: 5px 0;"><strong>開始予定日:</strong> {start_date}</p>
         </div>
 
         <details>
@@ -171,13 +148,7 @@ def create_internship_card(internship):
                 詳細情報を見る
             </summary>
             <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
-                <div style="margin-bottom: 10px;">
-                    <p style="margin: 5px 0;"><strong>必須スキル:</strong> {required_skills}</p>
-                    <p style="margin: 5px 0;"><strong>歓迎スキル:</strong> {preferred_skills}</p>
-                </div>
-                <div style="margin-top: 10px;">
-                    {format_description(description)}
-                </div>
+                {format_description(description)}
             </div>
         </details>
     </div>
