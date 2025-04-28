@@ -160,6 +160,11 @@ def fetch_internship_data():
             sheet_name = "info"
             st.info("シークレット設定が見つからないため、ハードコード値を使用します")
         
+        # デバッグ情報を表示
+        st.write("デバッグ情報:")
+        st.write(f"スプレッドシートID: {spreadsheet_id}")
+        st.write(f"シート名: {sheet_name}")
+        
         # データ範囲を指定してスプレッドシートからデータを取得
         result = service.spreadsheets().values().get(
             spreadsheetId=spreadsheet_id,
@@ -171,12 +176,23 @@ def fetch_internship_data():
             st.warning("スプレッドシートにデータがありません")
             return pd.DataFrame()
             
+        # デバッグ情報：生データの表示
+        st.write("生データの最初の5行:")
+        st.write(values[:5])
+            
         # ヘッダーと行データを取得
         headers = values[0]
         rows = values[1:]
         
         # DataFrameに変換
         df = pd.DataFrame(rows, columns=headers)
+        
+        # デバッグ情報：DataFrameの情報を表示
+        st.write("DataFrameの情報:")
+        st.write(f"行数: {len(df)}")
+        st.write(f"列名: {list(df.columns)}")
+        st.write("最初の5行のデータ:")
+        st.write(df.head())
         
         # 応募締切日と開始予定日を日付形式に変換
         try:
