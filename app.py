@@ -167,19 +167,6 @@ def main():
                     st.markdown(f"〆切: {internship['応募締切']:%Y-%m-%d}")
                 with st.expander("詳細を見る"):
                     # 詳細情報を表形式で表示
-                    detail_info = {
-                        "項目": ["必須スキル", "交通費", "勤務可能時間", "選考フロー", "募集人数", "歓迎スキル"],
-                        "内容": [
-                            internship.get('歓迎スキル', '未設定'),  # 必須スキルとして表示
-                            internship.get('交通費', '未設定'),
-                            internship.get('勤務可能時間', '未設定'),
-                            internship.get('選考フロー', '未設定'),
-                            internship.get('募集人数', '未設定'),
-                            internship.get('歓迎スキル2', '未設定')  # 歓迎スキルとして表示
-                        ]
-                    }
-                    st.table(pd.DataFrame(detail_info))
-                    st.markdown("### 説明")
                     st.markdown(create_internship_card(internship), unsafe_allow_html=True)
         st.markdown("---")  # 区切り線
 
