@@ -47,7 +47,7 @@ def fetch_internship_data():
         
         # それでもなければハードコード値を使用
         if spreadsheet_id is None:
-            spreadsheet_id = "1SsUwD9XsadcfaxsefaMu49lx72iQxaefdaefA7KzvM"  # あなたの実際のIDに置き換え
+            spreadsheet_id = "1SsUwD9XoDR5i1IzqSA_B4oxW0Mu49lQ72iQrhA7KzvM"
             sheet_name = "info"
             st.info("シークレット設定が見つからないため、ハードコード値を使用します")
         
@@ -71,12 +71,16 @@ def fetch_internship_data():
         st.write("生データの最初の5行:")
         st.write(values[:5])
             
-        # ヘッダーと行データを取得
-        headers = values[0]
-        rows = values[1:]
+        # 列名を定義
+        column_names = [
+            "インターン名", "企業名", "業界", "形式", "勤務地", "最寄り駅",
+            "期間", "職種", "必須スキル", "報酬", "交通費", "勤務可能時間",
+            "勤務日数", "勤務時間", "選考フロー", "応募締切", "開始予定日",
+            "募集人数", "歓迎スキル", "歓迎スキル2", "説明"
+        ]
         
-        # DataFrameに変換
-        df = pd.DataFrame(rows, columns=headers)
+        # データをDataFrameに変換
+        df = pd.DataFrame(values, columns=column_names)
         
         # デバッグ情報：DataFrameの情報を表示
         st.write("DataFrameの情報:")
