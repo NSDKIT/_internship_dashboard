@@ -156,10 +156,16 @@ def main():
         if selected_work_type != "すべて":
             df = df[df['形式'] == selected_work_type]
 
-    # カードを3列で表示
-    cols = st.columns(3)
-    for i, (_, internship) in enumerate(df.iterrows()):
-        with cols[i % 3]:
+    # 掲示板形式で表示
+    for _, internship in df.iterrows():
+        with st.expander(f"📌 {internship['インターン名']} - {internship['企業名']}"):
+            st.write(f"**業界:** {internship.get('業界', '未設定')}")
+            st.write(f"**形式:** {internship.get('形式', '未設定')}")
+            st.write(f"**勤務地:** {internship.get('勤務地', '未設定')}")
+            st.write(f"**期間:** {internship.get('期間', '未設定')}")
+            st.write(f"**職種:** {internship.get('職種', '未設定')}")
+            st.write(f"**応募締切:** {internship.get('応募締切', '未設定')}")
+            st.markdown("---")
             st.markdown(create_internship_card(internship), unsafe_allow_html=True)
 
 if __name__ == "__main__":
