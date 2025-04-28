@@ -44,7 +44,7 @@ def fetch_description_data():
 
 # 説明整形（Markdown→HTML変換）
 def format_description(text):
-    if not text or pd.isna(text):
+    if pd.isna(text) or (isinstance(text, str) and text.strip() == ""):
         return "<i>説明なし</i>"
 
     # 本格的にMarkdownパース
