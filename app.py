@@ -156,17 +156,76 @@ def main():
         if selected_work_type != "すべて":
             df = df[df['形式'] == selected_work_type]
 
-    # 掲示板形式で表示
-    for _, internship in df.iterrows():
-        with st.expander(f"📌 {internship['インターン名']} - {internship['企業名']}"):
-            st.write(f"**業界:** {internship.get('業界', '未設定')}")
-            st.write(f"**形式:** {internship.get('形式', '未設定')}")
-            st.write(f"**勤務地:** {internship.get('勤務地', '未設定')}")
-            st.write(f"**期間:** {internship.get('期間', '未設定')}")
-            st.write(f"**職種:** {internship.get('職種', '未設定')}")
-            st.write(f"**応募締切:** {internship.get('応募締切', '未設定')}")
-            st.markdown("---")
-            st.markdown(create_internship_card(internship), unsafe_allow_html=True)
+    # 表示する列を選択
+    display_columns = [
+        'インターン名', '企業名', '業界', '形式', '勤務地', '期間',
+        '職種', '応募締切', '開始予定日'
+    ]
+    
+    # 表形式で表示
+    st.dataframe(
+        df[display_columns],
+        column_config={
+            "インターン名": st.column_config.TextColumn(
+                "インターン名",
+                help="インターンシップの名称",
+                width="large"
+            ),
+            "企業名": st.column_config.TextColumn(
+                "企業名",
+                help="企業の名称",
+                width="medium"
+            ),
+            "業界": st.column_config.TextColumn(
+                "業界",
+                help="業界分類",
+                width="small"
+            ),
+            "形式": st.column_config.TextColumn(
+                "形式",
+                help="インターンシップの形式",
+                width="small"
+            ),
+            "勤務地": st.column_config.TextColumn(
+                "勤務地",
+                help="勤務場所",
+                width="medium"
+            ),
+            "期間": st.column_config.TextColumn(
+                "期間",
+                help="インターンシップ期間",
+                width="medium"
+            ),
+            "職種": st.column_config.TextColumn(
+                "職種",
+                help="募集職種",
+                width="medium"
+            ),
+            "応募締切": st.column_config.DateColumn(
+                "応募締切",
+                help="応募締切日",
+                format="YYYY-MM-DD"
+            ),
+            "開始予定日": st.column_config.DateColumn(
+                "開始予定日",
+                help="インターンシップ開始予定日",
+                format="YYYY-MM-DD"
+            )
+        },
+        hide_index=True,
+        use_container_width=True
+    )
+
+    # 詳細情報を表示するための選択
+    st.markdown("### 詳細情報")
+    selected_internship = st.selectbox(
+        "詳細を確認したいインターンシップを選択してください",
+        options=df['インターン名'].tolist()
+    )
+    
+    if selected_internship:
+        internship = df[df['インターン名'] == selected_internship].iloc[0]
+        st.markdown(create_internship_card(internship), unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
