@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-import re
+import markdown  # 追加ポイント！
 
 # ページ設定
 st.set_page_config(
@@ -39,18 +39,17 @@ def fetch_description_data():
 
     headers = values[0]
     rows = values[1:]
-
     df = pd.DataFrame(rows, columns=[headers])
     return df
 
-# 説明テキスト整形
+# 説明整形（Markdown→HTML変換）
 def format_description(text):
     if not text or pd.isna(text):
         return "<i>説明なし</i>"
 
-    text = re.sub(r'###\s*(.+)', r'<h3>\1</h3>', text)
-    text = text.replace('\n', '<br>')
-    return text
+    # 本格的にMarkdownパース
+    html = markdown.markdown(text)
+    return html
 
 # メインアプリ
 def main():
@@ -65,13 +64,10 @@ def main():
 
     st.write(f"**{len(df)}件** のインターン説明が見つかりました。")
 
-    # 3列レイアウト
     cols = st.columns(3)
 
     for i, row in enumerate(df.itertuples(index=False)):
         description = getattr(row, '説明', None)
-
-        # ★ここが違う：必ずカードを出す
         formatted = format_description(description)
 
         card_html = f"""
