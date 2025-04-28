@@ -17,21 +17,21 @@ st.set_page_config(
 st.markdown("""
     <style>
     .stApp {
-        background-color: #f0f2f6;
+        background-color: #f5f0e6;
     }
     .main .block-container {
         padding-top: 2rem;
         padding-bottom: 2rem;
     }
     .stButton>button {
-        background-color: #1e88e5;
+        background-color: #8B4513;
         color: white;
         border-radius: 5px;
         border: none;
         padding: 0.5rem 1rem;
     }
     .stButton>button:hover {
-        background-color: #1565c0;
+        background-color: #654321;
     }
     .stSelectbox>div>div>select {
         background-color: white;
@@ -51,11 +51,17 @@ st.markdown("""
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
     .sidebar .sidebar-content {
-        background-color: #1e88e5;
+        background-color: #8B4513;
         color: white;
     }
     .sidebar .sidebar-content .stSelectbox>div>div>select {
         background-color: white;
+    }
+    h1 {
+        color: #8B4513;
+    }
+    h2, h3 {
+        color: #654321;
     }
     </style>
     """, unsafe_allow_html=True)
@@ -204,7 +210,7 @@ def main():
     for idx, internship in df.iterrows():
         with st.container():
             st.markdown("""
-                <div style='background-color: white; padding: 20px; border-radius: 10px; margin: 10px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+                <div style='background-color: white; padding: 20px; border-radius: 10px; margin: 10px 0; box-shadow: 0 2px 4px rgba(139, 69, 19, 0.1); border-left: 4px solid #8B4513;'>
             """, unsafe_allow_html=True)
             
             cols = st.columns([1, 5])
