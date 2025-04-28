@@ -62,16 +62,12 @@ def fetch_internship_data():
             st.warning("スプレッドシートにデータがありません")
             return pd.DataFrame()
             
-        # 列名を定義
-        column_names = [
-            "インターン名", "企業名", "業界", "形式", "勤務地", "最寄り駅",
-            "期間", "職種", "必須スキル", "報酬", "交通費", "勤務可能時間",
-            "勤務日数", "勤務時間", "選考フロー", "応募締切", "開始予定日",
-            "募集人数", "歓迎スキル", "歓迎スキル2", "説明"
-        ]
+        # 1行目を列名として使用し、2行目以降をデータとして使用
+        column_names = values[0]
+        data = values[1:]
         
         # データをDataFrameに変換
-        df = pd.DataFrame(values, columns=column_names)
+        df = pd.DataFrame(data, columns=column_names)
         
         # 応募締切日と開始予定日を日付形式に変換
         try:
