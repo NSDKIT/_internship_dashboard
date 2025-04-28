@@ -95,20 +95,33 @@ def fetch_internship_data():
             st.error("Google Sheets APIサービスの取得に失敗しました")
             return pd.DataFrame()
             
-        # スプレッドシートIDとシート名を取得
-        try:
+        # スプレッドシートIDとシート名を取得 - 柔軟な取得方法
+        spreadsheet_id = None
+        sheet_name = None
+        
+        # トップレベルのシークレットを確認
+        if "SPREADSHEET_ID" in st.secrets:
             spreadsheet_id = st.secrets["SPREADSHEET_ID"]
             sheet_name = st.secrets.get("SHEET_NAME", "info")
-        except Exception as e:
-            st.error(f"シート情報の取得に失敗しました: {str(e)}")
-            return pd.DataFrame()
+        
+        # もしなければgcp_service_account内を確認
+        if spreadsheet_id is None and "gcp_service_account" in st.secrets:
+            if "SPREADSHEET_ID" in st.secrets["gcp_service_account"]:
+                spreadsheet_id = st.secrets["gcp_service_account"]["SPREADSHEET_ID"]
+                sheet_name = st.secrets["gcp_service_account"].get("SHEET_NAME", "info")
+        
+        # それでもなければハードコード値を使用
+        if spreadsheet_id is None:
+            spreadsheet_id = "1SsUwD9XsadcfaxsefaMu49lx72iQxaefdaefA7KzvM"  # あなたの実際のIDに置き換え
+            sheet_name = "info"
+            st.info("シークレット設定が見つからないため、ハードコード値を使用します")
         
         # データ範囲を指定してスプレッドシートからデータを取得
         result = service.spreadsheets().values().get(
             spreadsheetId=spreadsheet_id,
             range=f"{sheet_name}!A:U"
         ).execute()
-        
+                
         values = result.get('values', [])
         if not values:
             st.warning("スプレッドシートにデータがありません")
