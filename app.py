@@ -180,10 +180,12 @@ def fetch_internship_data():
         
         # 応募締切日と開始予定日を日付形式に変換
         try:
-            df['応募締切'] = pd.to_datetime(df['応募締切'], errors='coerce')
-            df['開始予定日'] = pd.to_datetime(df['開始予定日'], errors='coerce')
-        except:
-            pass
+            if '応募締切' in df.columns:
+                df['応募締切'] = pd.to_datetime(df['応募締切'], errors='coerce')
+            if '開始予定日' in df.columns:
+                df['開始予定日'] = pd.to_datetime(df['開始予定日'], errors='coerce')
+        except Exception as e:
+            st.warning(f"日付変換エラー: {str(e)}")
             
         return df
     except Exception as e:
@@ -317,7 +319,7 @@ def display_internship_card(internship):
         work_type = internship.get("形式", "不明") if "形式" in internship else "不明"
         salary = internship.get("報酬", "不明")
         deadline = internship.get("応募締切", "")
-        deadline_formatted = format_deadline(deadline)
+        deadline_formatted = format_deadline(deadline) if not pd.isna(deadline) else "未設定"
         description = internship.get("説明", "詳細情報はありません")
         
         # 説明をマークダウンからHTMLに変換
@@ -368,33 +370,17 @@ def main():
     </div>
     """, unsafe_allow_html=True)
     
-    # データソースの選択
-    data_source = st.radio(
-        "データソースを選択",
-        ["Googleスプレッドシート", "Excelファイルをアップロード"]
-    )
-    
-    df = pd.DataFrame()
-    
-    if data_source == "Googleスプレッドシート":
-        # Google Sheetsからデータ取得
-        with st.spinner("Googleスプレッドシートからデータを読み込み中..."):
-            df = fetch_internship_data()
-    else:
-        # Excelファイルをアップロード
-        uploaded_file = st.file_uploader("Excelファイルをアップロード", type=["xlsx", "xls"])
-        if uploaded_file is not None:
-            try:
-                with st.spinner("Excelファイルを読み込み中..."):
-                    df = pd.read_excel(uploaded_file)
-                    df = standardize_columns(df)  # 列名を標準化
-                st.success("Excelファイルの読み込みが完了しました")
-            except Exception as e:
-                st.error(f"ファイルの読み込みに失敗しました: {str(e)}")
-    
+    # 自動的にGoogleスプレッドシートからデータを読み込む
+    with st.spinner("インターンシップ情報を読み込み中..."):
+        df = fetch_internship_data()
+        
     if df.empty:
-        st.warning("データがありません。インターンシップ情報を先に登録するか、Excelファイルをアップロードしてください。")
+        st.warning("データがありません。インターンシップ情報を先に登録してください。")
         return
+    
+    # データフレームの列を確認
+    st.sidebar.header("データ情報")
+    st.sidebar.write(f"取得したデータ: {len(df)}件")
     
     # サイドバーにデバッグ情報を追加
     with st.sidebar.expander("デバッグ情報（開発者用）"):
@@ -404,7 +390,7 @@ def main():
             
             if "gcp_service_account" in st.secrets:
                 st.write("gcp_service_account内のキー:")
-                st.write(list(st.secrets["gcp_service_account"].keys()))
+                st.write([k for k in st.secrets["gcp_service_account"].keys() if k != "private_key"])
             else:
                 st.write("gcp_service_accountが見つかりません")
         except:
@@ -417,19 +403,40 @@ def main():
     # サイドバー - フィルター設定
     st.sidebar.header("フィルター設定")
     
-    # 業界フィルター
-    industries = ["すべて"] + sorted(df["業界"].unique().tolist())
-    selected_industry = st.sidebar.selectbox("業界", industries)
+    # 業界フィルター - 列が存在する場合のみ
+    if '業界' in df.columns:
+        industry_values = df['業界'].dropna().unique().tolist()
+        if industry_values:
+            industries = ["すべて"] + sorted(industry_values)
+            selected_industry = st.sidebar.selectbox("業界", industries)
+        else:
+            selected_industry = "すべて"
+    else:
+        selected_industry = "すべて"
+        st.sidebar.warning("業界データが見つかりません")
     
-    # 職種フィルター
-    positions = ["すべて"] + sorted(df["職種"].unique().tolist())
-    selected_position = st.sidebar.selectbox("職種", positions)
+    # 職種フィルター - 列が存在する場合のみ
+    if '職種' in df.columns:
+        position_values = df['職種'].dropna().unique().tolist()
+        if position_values:
+            positions = ["すべて"] + sorted(position_values)
+            selected_position = st.sidebar.selectbox("職種", positions)
+        else:
+            selected_position = "すべて"
+    else:
+        selected_position = "すべて"
+        st.sidebar.warning("職種データが見つかりません")
     
-    # 形式フィルター
-    work_types = ["すべて"]
-    if "形式" in df.columns:
-        work_types += sorted(df["形式"].unique().tolist())
-    selected_work_type = st.sidebar.selectbox("勤務形態", work_types)
+    # 形式フィルター - 列が存在する場合のみ
+    if '形式' in df.columns:
+        work_type_values = df['形式'].dropna().unique().tolist()
+        if work_type_values:
+            work_types = ["すべて"] + sorted(work_type_values)
+            selected_work_type = st.sidebar.selectbox("勤務形態", work_types)
+        else:
+            selected_work_type = "すべて"
+    else:
+        selected_work_type = "すべて"
     
     # 締切フィルター
     deadline_options = [
@@ -443,10 +450,10 @@ def main():
     # データフィルタリング
     filtered_df = df.copy()
     
-    if selected_industry != "すべて":
+    if selected_industry != "すべて" and '業界' in filtered_df.columns:
         filtered_df = filtered_df[filtered_df["業界"] == selected_industry]
         
-    if selected_position != "すべて":
+    if selected_position != "すべて" and '職種' in filtered_df.columns:
         filtered_df = filtered_df[filtered_df["職種"] == selected_position]
         
     if selected_work_type != "すべて" and "形式" in filtered_df.columns:
@@ -478,27 +485,36 @@ def main():
     with stats_col2:
         today = pd.Timestamp(datetime.now().date())
         if "応募締切" in df.columns and not df["応募締切"].isnull().all():
-            upcoming_deadlines = len(df[(df["応募締切"] >= today) & (df["応募締切"] <= today + timedelta(days=7))])
-            st.metric("今週締切のインターン", upcoming_deadlines)
+            try:
+                upcoming_deadlines = len(df[(df["応募締切"] >= today) & (df["応募締切"] <= today + timedelta(days=7))])
+                st.metric("今週締切のインターン", upcoming_deadlines)
+            except:
+                st.metric("今週締切のインターン", "不明")
         else:
             st.metric("今週締切のインターン", "不明")
         
     with stats_col3:
-        if "業界" in df.columns and not df["業界"].isnull().all():
-            most_common_industry = df["業界"].value_counts().index[0] if not df.empty else "なし"
-            st.metric("最も多い業界", most_common_industry)
+        if "業界" in df.columns and not df["業界"].isnull().all() and len(df) > 0:
+            try:
+                most_common_industry = df["業界"].value_counts().index[0]
+                st.metric("最も多い業界", most_common_industry)
+            except:
+                st.metric("最も多い業界", "不明")
         else:
             st.metric("最も多い業界", "不明")
         
     with stats_col4:
-        if "職種" in df.columns and not df["職種"].isnull().all():
-            most_common_position = df["職種"].value_counts().index[0] if not df.empty else "なし"
-            st.metric("最も多い職種", most_common_position)
+        if "職種" in df.columns and not df["職種"].isnull().all() and len(df) > 0:
+            try:
+                most_common_position = df["職種"].value_counts().index[0]
+                st.metric("最も多い職種", most_common_position)
+            except:
+                st.metric("最も多い職種", "不明")
         else:
             st.metric("最も多い職種", "不明")
     
     # 2. 可視化 - 業界別インターンシップ数
-    if "業界" in df.columns and not df["業界"].isnull().all():
+    if "業界" in df.columns and not df["業界"].isnull().all() and len(df) > 0:
         st.markdown("## 📈 業界別インターンシップ数")
         
         try:
@@ -525,18 +541,20 @@ def main():
     st.write(f"{len(filtered_df)} 件のインターンシップが見つかりました")
     
     # ソートオプション
-    sort_options = {
-        "応募締切が近い順": "応募締切",
-        "会社名(昇順)": "企業名", 
-        "最新登録順": "最新登録"
-    }
-    sort_by = st.selectbox("並び替え", list(sort_options.keys()))
+    sort_options = ["応募締切が近い順", "会社名(昇順)", "最新登録順"]
+    sort_by = st.selectbox("並び替え", sort_options)
     
     # ソート実行
     if sort_by == "応募締切が近い順" and "応募締切" in filtered_df.columns:
-        filtered_df = filtered_df.sort_values(by="応募締切")
+        try:
+            filtered_df = filtered_df.sort_values(by="応募締切")
+        except:
+            pass  # ソート失敗時は何もしない
     elif sort_by == "会社名(昇順)" and "企業名" in filtered_df.columns:
-        filtered_df = filtered_df.sort_values(by="企業名")
+        try:
+            filtered_df = filtered_df.sort_values(by="企業名")
+        except:
+            pass  # ソート失敗時は何もしない
     # 最新登録順はデフォルトのままとする
     
     # インターンシップカードを表示
