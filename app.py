@@ -8,9 +8,57 @@ import markdown
 # ページ設定
 st.set_page_config(
     page_title="インターン説明ダッシュボード",
-    page_icon="📄",
-    layout="wide"
+    page_icon="��",
+    layout="wide",
+    initial_sidebar_state="expanded"
 )
+
+# カスタムテーマ設定
+st.markdown("""
+    <style>
+    .stApp {
+        background-color: #f0f2f6;
+    }
+    .main .block-container {
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+    }
+    .stButton>button {
+        background-color: #1e88e5;
+        color: white;
+        border-radius: 5px;
+        border: none;
+        padding: 0.5rem 1rem;
+    }
+    .stButton>button:hover {
+        background-color: #1565c0;
+    }
+    .stSelectbox>div>div>select {
+        background-color: white;
+        border-radius: 5px;
+    }
+    .stExpander {
+        background-color: white;
+        border-radius: 5px;
+        padding: 1rem;
+        margin: 1rem 0;
+    }
+    .stContainer {
+        background-color: white;
+        border-radius: 5px;
+        padding: 1rem;
+        margin: 1rem 0;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .sidebar .sidebar-content {
+        background-color: #1e88e5;
+        color: white;
+    }
+    .sidebar .sidebar-content .stSelectbox>div>div>select {
+        background-color: white;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 # Google Sheets API 接続
 @st.cache_resource
@@ -155,20 +203,25 @@ def main():
     # 掲示板カード形式で表示
     for idx, internship in df.iterrows():
         with st.container():
+            st.markdown("""
+                <div style='background-color: white; padding: 20px; border-radius: 10px; margin: 10px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1);'>
+            """, unsafe_allow_html=True)
+            
             cols = st.columns([1, 5])
             with cols[0]:
                 # 企業ロゴやイメージのプレースホルダー
                 st.image("https://placehold.jp/80x80.png", width=80)
             with cols[1]:
-                st.markdown(f"**{internship['インターン名']}**")
-                st.markdown(f"{internship['企業名']} | {internship['業界']} | {internship['勤務地']} | {internship['職種']}")
-                st.markdown(f"💰 {internship.get('報酬', '未設定')} | 🕒 {internship.get('勤務日数', '未設定')}日/{internship.get('勤務時間', '未設定')}時間")
+                st.markdown(f"### {internship['インターン名']}")
+                st.markdown(f"**{internship['企業名']}** | {internship['業界']} | {internship['勤務地']} | {internship['職種']}")
+                st.markdown(f"💰 **報酬**: {internship.get('報酬', '未設定')} | 🕒 **勤務時間**: {internship.get('勤務日数', '未設定')}日/{internship.get('勤務時間', '未設定')}時間")
                 if pd.notna(internship.get('応募締切')):
-                    st.markdown(f"〆切: {internship['応募締切']:%Y-%m-%d}")
-                with st.expander("詳細を見る"):
-                    # 詳細情報を表形式で表示
+                    st.markdown(f"📅 **応募締切**: {internship['応募締切']:%Y-%m-%d}")
+                
+                with st.expander("詳細を見る", expanded=False):
                     st.markdown(create_internship_card(internship), unsafe_allow_html=True)
-        st.markdown("---")  # 区切り線
+            
+            st.markdown("</div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
