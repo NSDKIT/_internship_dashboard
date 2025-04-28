@@ -38,17 +38,26 @@ st.markdown("""
         border-radius: 5px;
     }
     .stExpander {
-        background-color: #f8f5f2;
+        background-color: white;
         border-radius: 5px;
         padding: 1rem;
         margin: 1rem 0;
     }
     .stContainer {
-        background-color: #f8f5f2;
-        border-radius: 5px;
+        background-color: white;
+        border-radius: 10px;
         padding: 1rem;
         margin: 1rem 0;
-        box-shadow: 0 2px 4px rgba(139,69,19,0.1);
+        box-shadow: 0 2px 8px rgba(139,69,19,0.08);
+        border: 2px solid #e0d3c2;
+    }
+    .internship-card {
+        background-color: white;
+        border-radius: 10px;
+        border: 2px solid #e0d3c2;
+        box-shadow: 0 2px 8px rgba(139,69,19,0.08);
+        padding: 20px;
+        margin: 20px 0;
     }
     .sidebar .sidebar-content {
         background-color: #8B4513;
@@ -210,7 +219,7 @@ def main():
     for idx, internship in df.iterrows():
         with st.container():
             st.markdown("""
-                <div style='background-color: white; padding: 20px; border-radius: 10px; margin: 10px 0; box-shadow: 0 2px 4px rgba(139, 69, 19, 0.1); border-left: 4px solid #8B4513;'>
+                <div class='internship-card'>
             """, unsafe_allow_html=True)
             
             cols = st.columns([1, 5])
