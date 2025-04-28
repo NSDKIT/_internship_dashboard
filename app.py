@@ -115,43 +115,7 @@ def create_internship_card(internship):
         deadline = deadline.strftime('%Y-%m-%d')
 
     card_html = f"""
-    <div style="
-        background: white;
-        padding: 20px;
-        margin-bottom: 20px;
-        border-radius: 10px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        min-height: 200px;
-    ">
-        <h3 style="color: #2c3e50; margin-top: 0;">{title}</h3>
-        <div style="margin-bottom: 15px;">
-            <span style="font-weight: bold; color: #3498db;">{company}</span>
-            <span style="margin-left: 10px; color: #7f8c8d;">{industry}</span>
-            <span style="margin-left: 10px; color: #7f8c8d;">{work_type}</span>
-        </div>
-        
-        <div style="margin-bottom: 15px;">
-            <p style="margin: 5px 0;"><strong>勤務地:</strong> {location}（{station}）</p>
-            <p style="margin: 5px 0;"><strong>期間:</strong> {period}</p>
-            <p style="margin: 5px 0;"><strong>職種:</strong> {position}</p>
-            <p style="margin: 5px 0;"><strong>報酬:</strong> {salary}</p>
-            <p style="margin: 5px 0;"><strong>応募締切:</strong> {deadline}</p>
-        </div>
-
-        <details>
-            <summary style="
-                font-weight: bold;
-                color: #3498db;
-                cursor: pointer;
-                padding: 5px 0;
-            ">
-                詳細情報を見る
-            </summary>
-            <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
-                {format_description(description)}
-            </div>
-        </details>
-    </div>
+            {format_description(description)}
     """
     return card_html
 
