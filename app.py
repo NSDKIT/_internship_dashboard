@@ -112,6 +112,94 @@ def format_description(text):
     html = markdown.markdown(text)
     return html
 
+def create_internship_card(internship):
+    """インターンシップ情報をカード形式で表示するHTMLを生成"""
+    title = internship.get('インターン名', '')
+    company = internship.get('企業名', '')
+    industry = internship.get('業界', '')
+    work_type = internship.get('形式', '')
+    location = internship.get('勤務地', '')
+    station = internship.get('最寄り駅', '')
+    period = internship.get('期間', '')
+    position = internship.get('職種', '')
+    salary = internship.get('報酬', '')
+    transportation = internship.get('交通費', '')
+    work_hours = internship.get('勤務可能時間', '')
+    work_days = internship.get('勤務日数', '')
+    work_time = internship.get('勤務時間', '')
+    selection = internship.get('選考フロー', '')
+    deadline = internship.get('応募締切', '')
+    start_date = internship.get('開始予定日', '')
+    required_skills = internship.get('必須スキル', '')
+    preferred_skills = internship.get('歓迎スキル', '')
+    description = internship.get('説明', '')
+
+    # 日付の整形
+    if isinstance(deadline, pd.Timestamp):
+        deadline = deadline.strftime('%Y-%m-%d')
+    if isinstance(start_date, pd.Timestamp):
+        start_date = start_date.strftime('%Y-%m-%d')
+
+    card_html = f"""
+    <div style="
+        background: white;
+        padding: 20px;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        min-height: 250px;
+    ">
+        <h3 style="color: #2c3e50; margin-top: 0;">{title}</h3>
+        <div style="margin-bottom: 15px;">
+            <span style="font-weight: bold; color: #3498db;">{company}</span>
+            <span style="margin-left: 10px; color: #7f8c8d;">{industry}</span>
+            <span style="margin-left: 10px; color: #7f8c8d;">{work_type}</span>
+        </div>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+            <div>
+                <p style="margin: 5px 0;"><strong>勤務地:</strong> {location}</p>
+                <p style="margin: 5px 0;"><strong>最寄り駅:</strong> {station}</p>
+                <p style="margin: 5px 0;"><strong>期間:</strong> {period}</p>
+                <p style="margin: 5px 0;"><strong>職種:</strong> {position}</p>
+            </div>
+            <div>
+                <p style="margin: 5px 0;"><strong>報酬:</strong> {salary}</p>
+                <p style="margin: 5px 0;"><strong>交通費:</strong> {transportation}</p>
+                <p style="margin: 5px 0;"><strong>勤務時間:</strong> {work_hours}</p>
+                <p style="margin: 5px 0;"><strong>勤務日数:</strong> {work_days}</p>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <p style="margin: 5px 0;"><strong>選考フロー:</strong> {selection}</p>
+            <p style="margin: 5px 0;"><strong>応募締切:</strong> {deadline}</p>
+            <p style="margin: 5px 0;"><strong>開始予定日:</strong> {start_date}</p>
+        </div>
+
+        <details>
+            <summary style="
+                font-weight: bold;
+                color: #3498db;
+                cursor: pointer;
+                padding: 5px 0;
+            ">
+                詳細情報を見る
+            </summary>
+            <div style="margin-top: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                <div style="margin-bottom: 10px;">
+                    <p style="margin: 5px 0;"><strong>必須スキル:</strong> {required_skills}</p>
+                    <p style="margin: 5px 0;"><strong>歓迎スキル:</strong> {preferred_skills}</p>
+                </div>
+                <div style="margin-top: 10px;">
+                    {format_description(description)}
+                </div>
+            </div>
+        </details>
+    </div>
+    """
+    return card_html
+
 # メインアプリ
 def main():
     st.title("📄 インターンシップ 説明ダッシュボード")
@@ -125,27 +213,35 @@ def main():
 
     st.write(f"**{len(df)}件** のインターン説明が見つかりました。")
 
+    # フィルター設定
+    st.sidebar.header("フィルター設定")
+    
+    # 業界フィルター
+    if '業界' in df.columns:
+        industries = ["すべて"] + sorted(df['業界'].dropna().unique().tolist())
+        selected_industry = st.sidebar.selectbox("業界", industries)
+        if selected_industry != "すべて":
+            df = df[df['業界'] == selected_industry]
+    
+    # 職種フィルター
+    if '職種' in df.columns:
+        positions = ["すべて"] + sorted(df['職種'].dropna().unique().tolist())
+        selected_position = st.sidebar.selectbox("職種", positions)
+        if selected_position != "すべて":
+            df = df[df['職種'] == selected_position]
+    
+    # 形式フィルター
+    if '形式' in df.columns:
+        work_types = ["すべて"] + sorted(df['形式'].dropna().unique().tolist())
+        selected_work_type = st.sidebar.selectbox("勤務形態", work_types)
+        if selected_work_type != "すべて":
+            df = df[df['形式'] == selected_work_type]
+
+    # カードを3列で表示
     cols = st.columns(3)
-
-    for i, row in enumerate(df.itertuples(index=False)):
-        description = getattr(row, '説明', None)
-        formatted = format_description(description)
-
-        card_html = f"""
-        <div style="background: white; padding: 20px; margin-bottom: 20px; 
-                    border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); 
-                    min-height: 250px;">
-            <details>
-              <summary style="font-weight: bold; color: #3498db; cursor: pointer;">
-                説明を読む
-              </summary>
-              <div style="margin-top: 10px;">{formatted}</div>
-            </details>
-        </div>
-        """
-
+    for i, (_, internship) in enumerate(df.iterrows()):
         with cols[i % 3]:
-            st.markdown(card_html, unsafe_allow_html=True)
+            st.markdown(create_internship_card(internship), unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
