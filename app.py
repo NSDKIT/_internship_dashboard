@@ -159,41 +159,13 @@ def main():
     # 掲示板形式で表示
     for _, internship in df.iterrows():
         with st.expander(f"📌 {internship['インターン名']} - {internship['企業名']}"):
-            # 基本情報を表形式で表示
-            basic_info = {
-                "項目": ["業界", "形式", "勤務地", "期間", "職種", "応募締切", "開始予定日"],
-                "内容": [
-                    internship.get('業界', '未設定'),
-                    internship.get('形式', '未設定'),
-                    internship.get('勤務地', '未設定'),
-                    internship.get('期間', '未設定'),
-                    internship.get('職種', '未設定'),
-                    internship.get('応募締切', '未設定'),
-                    internship.get('開始予定日', '未設定')
-                ]
-            }
-            st.table(pd.DataFrame(basic_info))
-            
-            # 詳細情報を表形式で表示
-            detail_info = {
-                "項目": ["必須スキル", "報酬", "交通費", "勤務可能時間", "勤務日数", "勤務時間", "選考フロー", "募集人数", "歓迎スキル", "歓迎スキル2"],
-                "内容": [
-                    internship.get('必須スキル', '未設定'),
-                    internship.get('報酬', '未設定'),
-                    internship.get('交通費', '未設定'),
-                    internship.get('勤務可能時間', '未設定'),
-                    internship.get('勤務日数', '未設定'),
-                    internship.get('勤務時間', '未設定'),
-                    internship.get('選考フロー', '未設定'),
-                    internship.get('募集人数', '未設定'),
-                    internship.get('歓迎スキル', '未設定'),
-                    internship.get('歓迎スキル2', '未設定')
-                ]
-            }
-            st.table(pd.DataFrame(detail_info))
-            
-            # 説明文を表示
-            st.markdown("### 説明")
+            st.write(f"**業界:** {internship.get('業界', '未設定')}")
+            st.write(f"**形式:** {internship.get('形式', '未設定')}")
+            st.write(f"**勤務地:** {internship.get('勤務地', '未設定')}")
+            st.write(f"**期間:** {internship.get('期間', '未設定')}")
+            st.write(f"**職種:** {internship.get('職種', '未設定')}")
+            st.write(f"**応募締切:** {internship.get('応募締切', '未設定')}")
+            st.markdown("---")
             st.markdown(create_internship_card(internship), unsafe_allow_html=True)
 
 if __name__ == "__main__":
