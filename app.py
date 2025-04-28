@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
-import markdown  # 追加ポイント！
+import markdown
 
 # ページ設定
 st.set_page_config(
@@ -21,7 +21,6 @@ def get_google_sheets_service():
     )
     return build('sheets', 'v4', credentials=credentials)
 
-<<<<<<< HEAD
 @st.cache_data(ttl=300)  # 5分間キャッシュ
 def fetch_internship_data():
     """Googleスプレッドシートからインターンシップデータを取得する関数"""
@@ -98,28 +97,7 @@ def fetch_internship_data():
         return df
     except Exception as e:
         st.error(f"データ取得エラー: {str(e)}")
-=======
-# データ取得（U列のみ）
-@st.cache_data(ttl=300)
-def fetch_description_data():
-    service = get_google_sheets_service()
-    spreadsheet_id = st.secrets["gcp_service_account"]["SPREADSHEET_ID"]
-    sheet_name = st.secrets["gcp_service_account"].get("SHEET_NAME", "info")
-
-    result = service.spreadsheets().values().get(
-        spreadsheetId=spreadsheet_id,
-        range=f"{sheet_name}!U:U"
-    ).execute()
-
-    values = result.get('values', [])
-    if not values or len(values) < 2:
->>>>>>> ecf6d49fb0f9f9ed9a7ad6a1f3b021408a29add7
         return pd.DataFrame()
-
-    headers = values[0]
-    rows = values[1:]
-    df = pd.DataFrame(rows, columns=[headers])
-    return df
 
 # 説明整形（Markdown→HTML変換）
 def format_description(text):
@@ -135,7 +113,7 @@ def main():
     st.title("📄 インターンシップ 説明ダッシュボード")
 
     with st.spinner("データ読み込み中..."):
-        df = fetch_description_data()
+        df = fetch_internship_data()
 
     if df.empty:
         st.warning("説明データが存在しません。")
